@@ -1,15 +1,12 @@
 import { NextResponse } from 'next/server';
 import { PDFDocument, StandardFonts, rgb, PageSizes } from 'pdf-lib';
 
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const body = await request.json();
-    console.log('Download API received blocks:', body.blocks);
-
     const { blocks = {}, format = 'pdf' } = body;
 
     if (!blocks || Object.keys(blocks).length === 0) {
-      console.log('No blocks received - returning error');
       return NextResponse.json({ error: 'No letter blocks provided' }, { status: 400 });
     }
 
@@ -27,62 +24,60 @@ export async function POST(request) {
     const lineHeight = 18;
     const marginLeft = 72;
     const marginRight = 72;
-    const marginTop = 72;     // Slightly more top margin for formal feel
+    const marginTop = 72;
     const marginBottom = 72;
 
     let y = page.getHeight() - marginTop;
-    //check if we have enough space for the next block, if not add a new page
+
     const checkPageBreak = (neededHeight = lineHeight) => {
-  if (y - neededHeight < marginBottom) {
-    page = pdfDoc.addPage(PageSizes.A4);
-    y = page.getHeight() - marginTop;
-  }
-};
+      if (y - neededHeight < marginBottom) {
+        page = pdfDoc.addPage(PageSizes.A4);
+        y = page.getHeight() - marginTop;
+      }
+    };
 
-    // Helper: Draw a right-aligned block with left-aligned lines (consistent left edge)
-    const drawRightAlignedBlock = (lines, font, size) => {
-  if (!lines || lines.length === 0) return;
+    const drawRightAlignedBlock = (lines: string[], font: any, size: number) => {
+      if (!lines || lines.length === 0) return;
 
-  let maxWidth = 0;
-  lines.forEach(line => {
-    const width = font.widthOfTextAtSize(line, size);
-    if (width > maxWidth) maxWidth = width;
-  });
+      let maxWidth = 0;
+      lines.forEach(line => {
+        const width = font.widthOfTextAtSize(line, size);
+        if (width > maxWidth) maxWidth = width;
+      });
 
-  const blockRight = page.getWidth() - marginRight;
+      const blockRight = page.getWidth() - marginRight;
 
-  lines.forEach(line => {
-    checkPageBreak();
-
-    const x = blockRight - maxWidth;
-    page.drawText(line, { x, y, size, font, color: rgb(0, 0, 0) });
-    y -= lineHeight;
-  });
-};
+      lines.forEach(line => {
+        checkPageBreak();
+        const x = blockRight - maxWidth;
+        page.drawText(line, { x, y, size, font, color: rgb(0, 0, 0) });
+        y -= lineHeight;
+      });
+    };
 
     // === Writer address + Date block - right-aligned ===
     const writerLines = [...(blocks.writer || [])];
-    if (blocks.date) writerLines.push(blocks.date); // Add date to writer block
+    if (blocks.date) writerLines.push(blocks.date);
 
     if (writerLines.length > 0) {
       drawRightAlignedBlock(writerLines, helvetica, fontSize);
-      y -= lineHeight * 2; // Extra space after writer/date block
+      y -= lineHeight * 2;
     }
 
     // === Receiver address - left-aligned ===
     if (blocks.receiver && blocks.receiver.length > 0) {
-      blocks.receiver.forEach(line => {
+      blocks.receiver.forEach((line: string) => {
         checkPageBreak();
-        page.drawText(line, { x: marginLeft, y, size: fontSize, font: helvetica, color: rgb(0,0,0) });
+        page.drawText(line, { x: marginLeft, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
         y -= lineHeight;
       });
-      y -= lineHeight * 2; // Extra space after receiver
+      y -= lineHeight * 2;
     }
 
     // === Salutation - left-aligned ===
     if (blocks.salutation) {
       checkPageBreak();
-      page.drawText(blocks.salutation, { x: marginLeft, y, size: fontSize, font: helvetica, color: rgb(0,0,0) });
+      page.drawText(blocks.salutation, { x: marginLeft, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
       y -= lineHeight * 1.5;
     }
 
@@ -95,7 +90,6 @@ export async function POST(request) {
       checkPageBreak(lineHeight * 2);
       page.drawText(titleText, { x, y, size: titleSize, font: helveticaBold, color: rgb(0, 0, 0) });
       y -= lineHeight / 2;
-      // Underline (thicker and centered)
       page.drawLine({
         start: { x: x - 5, y },
         end: { x: x + textWidth + 5, y },
@@ -105,94 +99,82 @@ export async function POST(request) {
       y -= lineHeight * 2;
     }
 
-    // === Body paragraphs - left-aligned, spaced ===
+    // === Body paragraphs ===
     if (blocks.paragraphs && blocks.paragraphs.length > 0) {
-      blocks.paragraphs.forEach(p => {
+      blocks.paragraphs.forEach((p: string) => {
         const maxWidth = page.getWidth() - marginLeft - marginRight;
         const words = p.split(' ');
         let currentLine = '';
         let paragraphY = y;
 
-       for (const word of words) {
-  const testLine = currentLine ? currentLine + ' ' + word : word;
+        for (const word of words) {
+          const testLine = currentLine ? currentLine + ' ' + word : word;
 
-  if (helvetica.widthOfTextAtSize(testLine, fontSize) > maxWidth) {
+          if (helvetica.widthOfTextAtSize(testLine, fontSize) > maxWidth) {
+            if (currentLine) {
+              if (paragraphY - lineHeight < marginBottom) {
+                page = pdfDoc.addPage(PageSizes.A4);
+                paragraphY = page.getHeight() - marginTop;
+              }
+              page.drawText(currentLine, {
+                x: marginLeft,
+                y: paragraphY,
+                size: fontSize,
+                font: helvetica,
+                color: rgb(0, 0, 0)
+              });
+              paragraphY -= lineHeight;
+            }
+            currentLine = word;
+          } else {
+            currentLine = testLine;
+          }
+        }
 
-    if (currentLine) {
+        if (currentLine) {
+          if (paragraphY - lineHeight < marginBottom) {
+            page = pdfDoc.addPage(PageSizes.A4);
+            paragraphY = page.getHeight() - marginTop;
+          }
+          page.drawText(currentLine, {
+            x: marginLeft,
+            y: paragraphY,
+            size: fontSize,
+            font: helvetica,
+            color: rgb(0, 0, 0)
+          });
+          paragraphY -= lineHeight;
+        }
 
-      if (paragraphY - lineHeight < marginBottom) {
-        page = pdfDoc.addPage(PageSizes.A4);
-        paragraphY = page.getHeight() - marginTop;
-      }
-
-      page.drawText(currentLine, {
-        x: marginLeft,
-        y: paragraphY,
-        size: fontSize,
-        font: helvetica,
-        color: rgb(0,0,0)
+        y = paragraphY;
       });
-
-      paragraphY -= lineHeight;
     }
 
-    currentLine = word;
+    // === Closing & Signature - right-aligned ===
+    if (blocks.closing || (blocks.signature && blocks.signature.length > 0)) {
+      const closingLines: string[] = [];
+      if (blocks.closing) closingLines.push(blocks.closing);
+      if (blocks.signature && blocks.signature.length > 0) {
+        closingLines.push(...blocks.signature);
+      }
+      if (closingLines.length > 0) {
+        drawRightAlignedBlock(closingLines, helvetica, fontSize);
+        y -= lineHeight;
+      }
+    }
 
-  } else {
-    currentLine = testLine;
-  }
-}
+    // FIX: Save as Uint8Array, convert to base64 string, send as JSON
+    // This avoids Vercel binary response issues entirely
+    const pdfBytes = await pdfDoc.save();
+    const base64 = Buffer.from(pdfBytes).toString('base64');
 
-if (currentLine) {
+    return NextResponse.json({ base64, size: pdfBytes.length });
 
-  if (paragraphY - lineHeight < marginBottom) {
-    page = pdfDoc.addPage(PageSizes.A4);
-    paragraphY = page.getHeight() - marginTop;
-  }
-
-  page.drawText(currentLine, {
-    x: marginLeft,
-    y: paragraphY,
-    size: fontSize,
-    font: helvetica,
-    color: rgb(0,0,0)
-  });
-
-  paragraphY -= lineHeight;
-}
-
-y = paragraphY //- lineHeight * 1.5; // Extra spacing between paragraphs
-});
-}
-
-// === Closing & Signature - right-aligned block ===
-if (blocks.closing || (blocks.signature && blocks.signature.length > 0)) {
-  const closingLines = [];
-  if (blocks.closing) closingLines.push(blocks.closing);
-  if (blocks.signature && blocks.signature.length > 0) {
-    closingLines.push(...blocks.signature);
-  }
-  if (closingLines.length > 0) {
-    drawRightAlignedBlock(closingLines, helvetica, fontSize);
-    y -= lineHeight;
-  }
-}
-
-const pdfBytes = await pdfDoc.save();
-const buffer = Buffer.from(pdfBytes);
-
-console.log('PDF generated - size:', buffer.length, 'bytes');
-
-return new NextResponse(buffer, {
-  status: 200,
-  headers: {
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': 'attachment; filename="letter.pdf"',
-    'Content-Length': buffer.length.toString(),
-  },
-});
   } catch (error) {
     console.error('PDF generation error:', error);
-    return NextResponse.json({ error: 'Failed to generate PDF' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to generate PDF', detail: String(error) },
+      { status: 500 }
+    );
   }
 }
