@@ -405,21 +405,21 @@ export default function PreviewPage() {
           position: 'fixed',
           inset: 0,
           background: 'rgba(0,0,0,0.7)',
-          display: 'flex',
-          alignItems: 'flex-start',
-          justifyContent: 'center',
           zIndex: 2000,
           overflow: 'auto',
           paddingTop: '1rem',
+          paddingBottom: '1rem',
         }}>
+          <div style={{
+            overflowX: 'auto',
+            
+          }}>
           <div style={{
             background: '#fff',
             padding: '2.54cm 1.27cm',
-            maxWidth: '21cm',
-            width: '90%',
+            width: '794px',
+            minWidth: '794px',
             minHeight: '29.7cm',
-            maxHeight: '90vh',
-            overflowY: 'auto',
             borderRadius: 8,
             boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
             position: 'relative',
@@ -427,6 +427,7 @@ export default function PreviewPage() {
             fontSize: '1.1rem',
             lineHeight: 1.8,
             boxSizing: 'border-box',
+            flexShrink: 0,
           }}>
 
             {/* Writer's address */}
@@ -513,6 +514,7 @@ export default function PreviewPage() {
             >
               Close Full View
             </button>
+          </div>
           </div>
         </div>
       )}
