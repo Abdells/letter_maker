@@ -84,7 +84,7 @@ export async function POST(request: Request) {
     // === Title - bold, centered, uppercase, underlined (with word-wrap) ===
     if (blocks.title) {
       const titleText = blocks.title.toUpperCase();
-      const titleSize = fontSize * 1.25;
+      const titleSize = fontSize * 1.2;
       const titleLineHeight = titleSize * 1.5;
       const maxTitleWidth = page.getWidth() - marginLeft - marginRight;
 
@@ -123,7 +123,7 @@ export async function POST(request: Request) {
         y -= titleLineHeight;
       });
 
-      y -= lineHeight * 1.5;
+      y -= lineHeight * 0.5;
     }
 
     // === Body paragraphs ===
@@ -203,7 +203,7 @@ export async function POST(request: Request) {
       }
 
       // One blank line between closing and dotted line
-      y -= lineHeight;
+      y -= lineHeight * 1.2;
 
       // Dotted line as wide as the widest signature line only
       let maxSigWidth = 40;
