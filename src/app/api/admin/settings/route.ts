@@ -16,7 +16,7 @@ export async function GET() {
 }
 
 // PUT to toggle payment
-export async function PUT(request) {
+export async function PUT(request: Request) {
   try {
     await connectDB();
     const { enabled } = await request.json();
