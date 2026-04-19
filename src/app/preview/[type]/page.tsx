@@ -19,7 +19,20 @@ export default function PreviewPage() {
   const [letterPrice, setLetterPrice] = useState(10);
   const [pendingAction, setPendingAction] = useState(null);
 
-  // ================= PAYSTACK SETUP =================
+  const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      const screenWidth = window.innerWidth;
+      const padding = 32; // 2rem padding on each side
+      const available = screenWidth - padding;
+      const newScale = Math.min(1, available / 794);
+      setScale(newScale);
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
   // Load Paystack inline script once on mount
   useEffect(() => {
     if (document.getElementById('paystack-script')) return; 
@@ -214,24 +227,35 @@ export default function PreviewPage() {
       style={{
         minHeight: '100vh',
         background: '#f8f9fa',
-        padding: '2rem 1rem',
-        overflowX: 'auto',
+        padding: '2rem 1rem 6rem 1rem',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}
     >
-      <div
-        className="letter-paper"
-        style={{
-          width: '794px',
-          minHeight: '1123px',
-          margin: '0 auto',
-          background: '#fff',
-          padding: '2.54cm 1.27cm',
-          borderRadius: 12,
-          boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
-          position: 'relative',
-          flexShrink: 0,
-        }}
-      >
+      {/* Scale wrapper - only wraps the letter paper */}
+      <div style={{
+        width: `${794 * scale}px`,
+        height: `${1123 * scale}px`,
+        position: 'relative',
+        flexShrink: 0,
+      }}>
+        <div
+          className="letter-paper"
+          style={{
+            width: '794px',
+            minHeight: '1123px',
+            background: '#fff',
+            padding: '2.54cm 1.27cm',
+            borderRadius: 12,
+            boxShadow: '0 6px 20px rgba(0,0,0,0.1)',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            transformOrigin: 'top left',
+            transform: `scale(${scale})`,
+          }}
+        >
 
         {/* Writer's address - top right */}
         <div style={{
@@ -290,49 +314,56 @@ export default function PreviewPage() {
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div style={{
-          textAlign: 'center',
-          marginTop: '3rem',
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '1.5rem',
-          flexWrap: 'wrap'
-        }}>
-
-          <button
-            onClick={() => {
-              if (paymentRequired && !isPaid) {
-                setShowPaymentModal(true);
-                setPendingAction('read');
-              } else {
-                setShowFullPreview(true);
-              }
-            }}
-            style={btnBlue}
-          >
-            Read Full Letter
-          </button>
-
-          <button onClick={() => router.back()} style={btnGrey}>
-            Edit Text
-          </button>
-
-          <button
-            onClick={() => {
-              if (paymentRequired && !isPaid) {
-                setShowPaymentModal(true);
-                setPendingAction('download');
-              } else {
-                handleDownload('pdf');
-              }
-            }}
-            style={btnBlue}
-          >
-            Download PDF
-          </button>
-
         </div>
+      </div>
+
+      {/* Action Buttons - fixed bottom bar, always visible on all screens */}
+      <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        background: 'white',
+        borderTop: '1px solid #e9ecef',
+        padding: '0.8rem 1rem',
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '1rem',
+        flexWrap: 'wrap',
+        zIndex: 100,
+        boxShadow: '0 -4px 12px rgba(0,0,0,0.08)',
+      }}>
+        <button
+          onClick={() => {
+            if (paymentRequired && !isPaid) {
+              setShowPaymentModal(true);
+              setPendingAction('read');
+            } else {
+              setShowFullPreview(true);
+            }
+          }}
+          style={btnBlue}
+        >
+          Read Full Letter
+        </button>
+
+        <button onClick={() => router.back()} style={btnGrey}>
+          Edit Text
+        </button>
+
+        <button
+          onClick={() => {
+            if (paymentRequired && !isPaid) {
+              setShowPaymentModal(true);
+              setPendingAction('download');
+            } else {
+              handleDownload('pdf');
+            }
+          }}
+          style={btnBlue}
+        >
+          Download PDF
+        </button>
       </div>
 
       {/* Payment Modal */}
@@ -421,27 +452,34 @@ export default function PreviewPage() {
           zIndex: 2000,
           overflow: 'auto',
           paddingTop: '1rem',
-          paddingBottom: '1rem',
+          paddingBottom: '4rem',
         }}>
+          {/* Outer centering wrapper */}
           <div style={{
-            overflowX: 'auto',
-            
+            display: 'flex',
+            justifyContent: 'center',
+            minHeight: '100%',
           }}>
-          <div style={{
-            background: '#fff',
-            padding: '2.54cm 1.27cm',
-            width: '794px',
-            minWidth: '794px',
-            minHeight: '29.7cm',
-            borderRadius: 8,
-            boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
-            position: 'relative',
-            fontFamily: 'Helvetica, Arial, sans-serif',
-            fontSize: '1.1rem',
-            lineHeight: 1.8,
-            boxSizing: 'border-box',
-            flexShrink: 0,
-          }}>
+            {/* Scale wrapper - sized to scaled dimensions so scroll works correctly */}
+            <div style={{
+              width: `${794 * scale}px`,
+              flexShrink: 0,
+              position: 'relative',
+            }}>
+              <div style={{
+                background: '#fff',
+                padding: '2.54cm 1.27cm',
+                width: '794px',
+                minHeight: '29.7cm',
+                borderRadius: 8,
+                boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
+                fontFamily: 'Helvetica, Arial, sans-serif',
+                fontSize: '1.1rem',
+                lineHeight: 1.8,
+                boxSizing: 'border-box',
+                transformOrigin: 'top left',
+                transform: `scale(${scale})`,
+              }}>
 
             {/* Writer's address */}
             <div style={{
@@ -527,7 +565,8 @@ export default function PreviewPage() {
             >
               Close Full View
             </button>
-          </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
