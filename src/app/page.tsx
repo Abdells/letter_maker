@@ -12,7 +12,7 @@ export default function Home() {
             Create Professional Letters in a Minute
           </h1>
           <p style={{ fontSize: '1.3rem', color: '#4b5563', marginBottom: '2.5rem' }}>
-            LetterGen helps professionals to generate human-perfected official letters quickly. Correctly formatted, standard, and ready to print or email. 100% human written letters.
+            The letter generator helps professionals to generate human-perfected official letters quickly. Correctly formatted, standard, and ready to print or email. 100% human written letters.
           </p>
           <Link href="/create">
             <button style={{
