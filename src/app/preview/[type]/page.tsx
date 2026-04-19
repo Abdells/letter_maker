@@ -344,57 +344,70 @@ export default function PreviewPage() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          padding: '1rem',
         }}>
           <div style={{
             background: 'white',
-            padding: '2.5rem',
-            borderRadius: 12,
+            padding: '2.5rem 2rem',
+            borderRadius: 16,
             maxWidth: 420,
+            width: '100%',
             textAlign: 'center',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+            boxShadow: '0 20px 60px rgba(0,0,0,0.35)',
           }}>
-            <h2 style={{ marginBottom: '1.5rem', fontSize: '1.6rem' }}>
-              Unlock Full Letter
+            
+            <h2 style={{ marginBottom: '0.5rem', fontSize: '1.5rem', fontWeight: 700, color: '#1a1a1a' }}>
+              Your Letter is Ready
             </h2>
-            <p style={{ marginBottom: '2rem', color: '#555', fontSize: '1.1rem' }}>
-              One-time payment: <strong>GHS {letterPrice.toFixed(2)}</strong><br />
-              Get full preview + PDF / Word download
+            <p style={{ marginBottom: '0.5rem', color: '#555', fontSize: '1rem', lineHeight: 1.6 }}>
+              Unlock the full letter and download a professionally formatted PDF for:
+            </p>
+            <p style={{ marginBottom: '1.8rem', fontSize: '1.5rem', fontWeight: 800, color: '#0d6efd' }}>
+              GHS {letterPrice.toFixed(2)}
             </p>
 
-            <button
-              onClick={() => openPaystack(pendingAction as 'read' | 'download')}
-              style={{
-                padding: '1rem 2.5rem',
-                background: '#0d6efd',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: '1.1rem',
-                cursor: 'pointer',
-                marginRight: '1rem'
-              }}
-            >
-              Pay Now (GHS {letterPrice.toFixed(2)})
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <button
+                onClick={() => openPaystack(pendingAction as 'read' | 'download')}
+                style={{
+                  padding: '1rem',
+                  background: '#0d6efd',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: '1.1rem',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  width: '100%',
+                }}
+              >
+                Pay & Unlock — GHS {letterPrice.toFixed(2)}
+              </button>
 
-            <button
-              onClick={() => {
-                setShowPaymentModal(false);
-                setPendingAction(null);
-              }}
-              style={{
-                padding: '1rem 2rem',
-                background: '#6c757d',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                fontSize: '1.1rem',
-                cursor: 'pointer'
-              }}
-            >
-              Cancel
-            </button>
+              <button
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  setPendingAction(null);
+                }}
+                style={{
+                  padding: '0.8rem',
+                  background: 'transparent',
+                  color: '#888',
+                  border: '1px solid #ddd',
+                  borderRadius: 10,
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  width: '100%',
+                }}
+              >
+                Not now
+              </button>
+            </div>
+
+            <p style={{ marginTop: '1.2rem', fontSize: '0.85rem', color: '#aaa' }}>
+              Secure payment powered by Paystack
+            </p>
           </div>
         </div>
       )}
@@ -471,7 +484,7 @@ export default function PreviewPage() {
             )}
 
             {paragraphs.map((p, i) => (
-              <p key={i} style={{ marginBottom: '1.4rem' }}>{p}</p>
+              <p key={i} style={{ marginBottom: '1.5rem' }}>{p}</p>
             ))}
 
             {closing && (
