@@ -15,13 +15,13 @@ export default function NewTemplate() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
     try {
-      console.log('Submitting form data:', form); // Debug: see what's sent
+      console.log('Submitting form data:', form);
 
       const response = await fetch('/api/admin/templates', {
         method: 'POST',
@@ -38,10 +38,10 @@ export default function NewTemplate() {
       }
 
       const newTemplate = await response.json();
-      console.log('New template created:', newTemplate); // Debug
+      console.log('New template created:', newTemplate);
 
       router.push('/admin');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Add template error:', err);
       setError(err.message || 'Failed to save template');
     } finally {

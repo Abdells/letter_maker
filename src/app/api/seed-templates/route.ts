@@ -7,7 +7,7 @@ export async function GET() {
     await connectDB();
 
     // Clear old ones (safe for dev)
-    await LetterTemplate.deleteMany({});
+    await (LetterTemplate as any).deleteMany({});
 
     const templates = [
       {
@@ -115,7 +115,7 @@ Yours sincerely,
       },
     ];
 
-    await LetterTemplate.insertMany(templates);
+    await (LetterTemplate as any).insertMany(templates);
 
     return NextResponse.json({ success: true, inserted: templates.length });
   } catch (error) {

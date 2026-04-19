@@ -3,10 +3,16 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface Template {
+  _id: string;
+  type: string;
+  title: string;
+}
+
 export default function CreatePage() {
   const [profession, setProfession] = useState('');
   const [letterType, setLetterType] = useState('');
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 

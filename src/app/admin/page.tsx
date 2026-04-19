@@ -2,8 +2,15 @@
 
 import { useEffect, useState } from 'react';
 
+interface Template {
+  _id: string;
+  title: string;
+  category: string;
+  type: string;
+}
+
 export default function AdminDashboard() {
-  const [templates, setTemplates] = useState([]);
+  const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('templates');
@@ -17,7 +24,7 @@ export default function AdminDashboard() {
         if (!res.ok) throw new Error('Failed to load templates');
         const data = await res.json();
         setTemplates(data);
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
       } finally {
         setLoading(false);
@@ -35,7 +42,7 @@ export default function AdminDashboard() {
       .catch(() => setPaymentRequired(true)); // default ON
   }, []);
 
-  const deleteTemplate = async (id) => {
+  const deleteTemplate = async (id: string) => {
     if (!confirm('Delete this template permanently?')) return;
 
     try {
@@ -43,13 +50,13 @@ export default function AdminDashboard() {
       if (!res.ok) throw new Error('Delete failed');
       const updated = await fetch('/api/admin/templates');
       setTemplates(await updated.json());
-    } catch (err) {
+    } catch (err: any) {
       alert('Delete failed: ' + err.message);
     }
   };
 
   // Save toggle change to backend
-  const togglePayment = async (newValue) => {
+  const togglePayment = async (newValue: boolean) => {
     setPaymentRequired(newValue);
     try {
       const res = await fetch('/api/admin/settings', {
@@ -58,7 +65,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ enabled: newValue })
       });
       if (!res.ok) throw new Error('Failed to save');
-    } catch (err) {
+    } catch (err: any) {
       alert('Failed to save setting. Reverting...');
       setPaymentRequired(!newValue); // revert on error
     }

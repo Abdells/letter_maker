@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 // Extend global type to avoid TS error "Property 'mongoose' does not exist"
 declare global {
   var mongoose: {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
+    conn: typeof import('mongoose') | null;
+    promise: Promise<typeof import('mongoose')> | null;
   } | undefined;
 }
 
@@ -22,18 +22,18 @@ if (!cached) {
   cached = global.mongoose = { conn: null, promise: null };
 }
 
-async function connectDB(): Promise<typeof mongoose> {
-  if (cached.conn) {
+async function connectDB() {
+  if (cached!.conn) {
     console.log('Using cached MongoDB connection');
-    return cached.conn;
+    return cached!.conn;
   }
 
-  if (!cached.promise) {
+  if (!cached!.promise) {
     const opts = {
       bufferCommands: false,
     };
 
-    cached.promise = mongoose
+    cached!.promise = mongoose
       .connect(MONGODB_URI as string, opts)
       .then((mongooseInstance) => {
         console.log(`MongoDB connected to database: ${DATABASE_NAME}`);
@@ -46,10 +46,10 @@ async function connectDB(): Promise<typeof mongoose> {
   }
 
   try {
-    cached.conn = await cached.promise;
-    return cached.conn;
+    cached!.conn = await cached!.promise;
+    return cached!.conn;
   } catch (error) {
-    cached.promise = null; // Reset promise on failure
+    cached!.promise = null;
     throw error;
   }
 }

@@ -28,7 +28,7 @@ const seedData = async () => {
     await connectDB();
 
     // Clear existing templates (for dev — comment out in production)
-    await LetterTemplate.deleteMany({});
+    await (LetterTemplate as any).deleteMany({});
 
     const templates = [
       // Teacher: Recommendation Letter
@@ -139,7 +139,7 @@ Yours sincerely,
       },
     ];
 
-    await LetterTemplate.insertMany(templates);
+    await (LetterTemplate as any).insertMany(templates);
     console.log(`Successfully inserted ${templates.length} templates!`);
 
     await mongoose.connection.close();

@@ -113,7 +113,7 @@ export default function PreviewPage() {
         Object.entries(parsedData).forEach(([key, value]) => {
           templateContent = templateContent.replace(
             new RegExp(`{{${key}}}`, 'g'),
-            value || ''
+            String(value || '')
           );
         });
 
