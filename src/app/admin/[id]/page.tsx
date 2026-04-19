@@ -59,7 +59,7 @@ export default function EditTemplate() {
       });
       if (!res.ok) throw new Error('Update failed');
       router.push('/admin');
-    } catch (err) {
+    } catch (err: any) {
       alert('Update failed: ' + err.message);
     }
   };
