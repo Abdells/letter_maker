@@ -45,7 +45,7 @@ export default function EditTemplate() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await fetch('/api/admin/templates', {
