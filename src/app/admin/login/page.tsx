@@ -44,7 +44,7 @@ export default function AdminLogin() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         onKeyDown={handleKeyDown}
-        style={{ width: '100%', padding: '1rem', marginBottom: '1rem' }}
+        style={{ width: '100%', padding: '1rem',borderRadius:'30px', marginBottom: '1rem' }}
         placeholder="Enter password"
         disabled={loading}
       />
@@ -54,7 +54,7 @@ export default function AdminLogin() {
       <button
         onClick={handleLogin}
         disabled={loading}
-        style={{ padding: '1rem 2rem', background: '#0d6efd', color: 'white', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
+        style={{ padding: '1rem 3rem', background: '#0d6efd', color: 'white', border: 'none', borderRadius: '30px', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1 }}
       >
         {loading ? 'Logging in...' : 'Login'}
       </button>

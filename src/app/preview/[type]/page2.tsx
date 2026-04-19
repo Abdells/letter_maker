@@ -470,25 +470,15 @@ export default function PreviewPage() {
             )}
 
             {paragraphs.map((p, i) => (
-              <p key={i} style={{ marginBottom: '1.4rem' }}>{p}</p>
+              <p key={i} style={{ margin: 0, marginBottom: '1rem', lineHeight: 1.8 }}>{p}</p>
             ))}
 
             {closing && (
               <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <div style={{ textAlign: 'left', maxWidth: '45%', minWidth: '220px' }}>
-                  <p style={{ marginBottom: '0', fontWeight: 500 }}>{closing}</p>
-                  <div style={{ height: '1.4rem' }} />
-                  <div style={{
-                    borderBottom: '1px dotted #000',
-                    width: 'fit-content',
-                    marginBottom: '0.3rem',
-                  }}>
-                    <span style={{ visibility: 'hidden', fontSize: '1.1rem', whiteSpace: 'nowrap' }}>
-                      {signature?.length > 0
-                        ? signature.reduce((a, b) => a.length >= b.length ? a : b, '')
-                        : 'Signature'}
-                    </span>
-                  </div>
+                  <p style={{ marginBottom: '0.5rem', fontWeight: 500 }}>{closing}</p>
+                  {/* Signature gap: space for physical signature */}
+                  <div style={{ height: '3.5rem' }} />
                   {signature?.length > 0 && signature.map((l, i) => (
                     <div key={i} style={{ marginBottom: '0.3rem' }}>{l}</div>
                   ))}

@@ -177,53 +177,21 @@ export async function POST(request: Request) {
       });
     }
 
-    // === Closing & Signature - right-aligned, with dotted signature line ===
+    // === Closing & Signature - right-aligned, with signature gap ===
     if (blocks.closing || (blocks.signature && blocks.signature.length > 0)) {
       // Extra space after last paragraph before closing
       y -= lineHeight;
 
-      const sigLines = blocks.signature || [];
-
-      // Measure widest line across closing + signature to anchor the block's left edge
-      const allLines = blocks.closing ? [blocks.closing, ...sigLines] : sigLines;
-      let maxBlockWidth = 40;
-      allLines.forEach((line: string) => {
-        const w = helvetica.widthOfTextAtSize(line, fontSize);
-        if (w > maxBlockWidth) maxBlockWidth = w;
-      });
-
-      // Block starts so its right edge aligns with marginRight
-      const blockX = page.getWidth() - marginRight - maxBlockWidth;
-
-      // Draw closing left-aligned within the block
       if (blocks.closing) {
-        checkPageBreak();
-        page.drawText(blocks.closing, { x: blockX, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
-        y -= lineHeight;
+        drawRightAlignedBlock([blocks.closing], helvetica, fontSize);
       }
 
-      // One blank line between closing and dotted line
-      y -= lineHeight;
+      // 3 blank lines for physical signature space
+      y -= lineHeight * 3;
 
-      // Dotted line as wide as the widest signature line only
-      let maxSigWidth = 40;
-      sigLines.forEach((line: string) => {
-        const w = helvetica.widthOfTextAtSize(line, fontSize);
-        if (w > maxSigWidth) maxSigWidth = w;
-      });
-
-      const dotSpacing = 4;
-      for (let dx = 0; dx <= maxSigWidth; dx += dotSpacing) {
-        page.drawCircle({ x: blockX + dx, y: y + 4, size: 0.8, color: rgb(0, 0, 0) });
+      if (blocks.signature && blocks.signature.length > 0) {
+        drawRightAlignedBlock(blocks.signature, helvetica, fontSize);
       }
-      y -= lineHeight;
-
-      // Signature lines left-aligned within the block
-      sigLines.forEach((line: string) => {
-        checkPageBreak();
-        page.drawText(line, { x: blockX, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
-        y -= lineHeight;
-      });
 
       y -= lineHeight;
     }

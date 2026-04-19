@@ -81,49 +81,22 @@ export async function POST(request: Request) {
       y -= lineHeight * 1.5;
     }
 
-    // === Title - bold, centered, uppercase, underlined (with word-wrap) ===
+    // === Title - bold, centered, uppercase, underlined ===
     if (blocks.title) {
       const titleText = blocks.title.toUpperCase();
       const titleSize = fontSize * 1.25;
-      const titleLineHeight = titleSize * 1.5;
-      const maxTitleWidth = page.getWidth() - marginLeft - marginRight;
-
-      // Word-wrap the title into lines
-      const titleWords = titleText.split(' ');
-      const titleLines: string[] = [];
-      let currentTitleLine = '';
-
-      for (const word of titleWords) {
-        const testLine = currentTitleLine ? currentTitleLine + ' ' + word : word;
-        if (helveticaBold.widthOfTextAtSize(testLine, titleSize) > maxTitleWidth) {
-          if (currentTitleLine) titleLines.push(currentTitleLine);
-          currentTitleLine = word;
-        } else {
-          currentTitleLine = testLine;
-        }
-      }
-      if (currentTitleLine) titleLines.push(currentTitleLine);
-
-      const neededHeight = titleLines.length * titleLineHeight + lineHeight;
-      checkPageBreak(neededHeight);
-
-      // Draw each title line centered with underline
-      titleLines.forEach((line, idx) => {
-        const lineWidth = helveticaBold.widthOfTextAtSize(line, titleSize);
-        const x = (page.getWidth() - lineWidth) / 2;
-        page.drawText(line, { x, y, size: titleSize, font: helveticaBold, color: rgb(0, 0, 0) });
-        // Underline sits just below the text
-        const underlineY = y - titleSize * 0.15;
-        page.drawLine({
-          start: { x: x - 2, y: underlineY },
-          end: { x: x + lineWidth + 2, y: underlineY },
-          thickness: 1.5,
-          color: rgb(0, 0, 0),
-        });
-        y -= titleLineHeight;
+      const textWidth = helveticaBold.widthOfTextAtSize(titleText, titleSize);
+      const x = (page.getWidth() - textWidth) / 2;
+      checkPageBreak(lineHeight * 2);
+      page.drawText(titleText, { x, y, size: titleSize, font: helveticaBold, color: rgb(0, 0, 0) });
+      y -= lineHeight / 2;
+      page.drawLine({
+        start: { x: x - 5, y },
+        end: { x: x + textWidth + 5, y },
+        thickness: 1.5,
+        color: rgb(0, 0, 0)
       });
-
-      y -= lineHeight * 1.5;
+      y -= lineHeight * 2;
     }
 
     // === Body paragraphs ===
@@ -177,57 +150,21 @@ export async function POST(request: Request) {
       });
     }
 
-    // === Closing & Signature - right-aligned, with dotted signature line ===
+    // === Closing & Signature - right-aligned ===
     if (blocks.closing || (blocks.signature && blocks.signature.length > 0)) {
-      // Extra space after last paragraph before closing
-      y -= lineHeight;
-
-      const sigLines = blocks.signature || [];
-
-      // Measure widest line across closing + signature to anchor the block's left edge
-      const allLines = blocks.closing ? [blocks.closing, ...sigLines] : sigLines;
-      let maxBlockWidth = 40;
-      allLines.forEach((line: string) => {
-        const w = helvetica.widthOfTextAtSize(line, fontSize);
-        if (w > maxBlockWidth) maxBlockWidth = w;
-      });
-
-      // Block starts so its right edge aligns with marginRight
-      const blockX = page.getWidth() - marginRight - maxBlockWidth;
-
-      // Draw closing left-aligned within the block
-      if (blocks.closing) {
-        checkPageBreak();
-        page.drawText(blocks.closing, { x: blockX, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
+      const closingLines: string[] = [];
+      if (blocks.closing) closingLines.push(blocks.closing);
+      if (blocks.signature && blocks.signature.length > 0) {
+        closingLines.push(...blocks.signature);
+      }
+      if (closingLines.length > 0) {
+        drawRightAlignedBlock(closingLines, helvetica, fontSize);
         y -= lineHeight;
       }
-
-      // One blank line between closing and dotted line
-      y -= lineHeight;
-
-      // Dotted line as wide as the widest signature line only
-      let maxSigWidth = 40;
-      sigLines.forEach((line: string) => {
-        const w = helvetica.widthOfTextAtSize(line, fontSize);
-        if (w > maxSigWidth) maxSigWidth = w;
-      });
-
-      const dotSpacing = 4;
-      for (let dx = 0; dx <= maxSigWidth; dx += dotSpacing) {
-        page.drawCircle({ x: blockX + dx, y: y + 4, size: 0.8, color: rgb(0, 0, 0) });
-      }
-      y -= lineHeight;
-
-      // Signature lines left-aligned within the block
-      sigLines.forEach((line: string) => {
-        checkPageBreak();
-        page.drawText(line, { x: blockX, y, size: fontSize, font: helvetica, color: rgb(0, 0, 0) });
-        y -= lineHeight;
-      });
-
-      y -= lineHeight;
     }
 
+    // FIX: Save as Uint8Array, convert to base64 string, send as JSON
+    // This avoids Vercel binary response issues entirely
     const pdfBytes = await pdfDoc.save();
     const base64 = Buffer.from(pdfBytes).toString('base64');
 

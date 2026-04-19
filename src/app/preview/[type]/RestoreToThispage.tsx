@@ -423,9 +423,10 @@ export default function PreviewPage() {
             borderRadius: 8,
             boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
             position: 'relative',
-            fontFamily: 'Helvetica, Arial, sans-serif',
+            fontFamily: 'Georgia, serif',
             fontSize: '1.1rem',
             lineHeight: 1.8,
+            whiteSpace: 'pre-wrap',
             boxSizing: 'border-box',
           }}>
 
@@ -461,9 +462,7 @@ export default function PreviewPage() {
                 textDecoration: 'underline',
                 textUnderlineOffset: '6px',
                 letterSpacing: '0.5px',
-                textAlign: 'center',
-                overflowWrap: 'break-word',
-                wordBreak: 'break-word',
+                textAlign: 'center'
               }}>
                 {title}
               </p>
@@ -476,19 +475,7 @@ export default function PreviewPage() {
             {closing && (
               <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
                 <div style={{ textAlign: 'left', maxWidth: '45%', minWidth: '220px' }}>
-                  <p style={{ marginBottom: '0', fontWeight: 500 }}>{closing}</p>
-                  <div style={{ height: '1.4rem' }} />
-                  <div style={{
-                    borderBottom: '1px dotted #000',
-                    width: 'fit-content',
-                    marginBottom: '0.3rem',
-                  }}>
-                    <span style={{ visibility: 'hidden', fontSize: '1.1rem', whiteSpace: 'nowrap' }}>
-                      {signature?.length > 0
-                        ? signature.reduce((a, b) => a.length >= b.length ? a : b, '')
-                        : 'Signature'}
-                    </span>
-                  </div>
+                  <p style={{ marginBottom: '0.5rem', fontWeight: 500 }}>{closing}</p>
                   {signature?.length > 0 && signature.map((l, i) => (
                     <div key={i} style={{ marginBottom: '0.3rem' }}>{l}</div>
                   ))}
