@@ -325,13 +325,13 @@ export default function PreviewPage() {
         right: 0,
         background: 'white',
         borderTop: '1px solid #e9ecef',
-        padding: '0.6rem 0.5rem',
+        padding: '0.8rem 1rem',
         display: 'flex',
         justifyContent: 'center',
-        gap: '0.5rem',
+        gap: '1rem',
+        flexWrap: 'wrap',
         zIndex: 100,
         boxShadow: '0 -4px 12px rgba(0,0,0,0.08)',
-        flexWrap: 'nowrap',
       }}>
         <button
           onClick={() => {
@@ -342,37 +342,12 @@ export default function PreviewPage() {
               setShowFullPreview(true);
             }
           }}
-          style={{
-            padding: '0.6rem 0.8rem',
-            background: '#0d6efd',
-            color: 'white',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            flex: 1,
-            maxWidth: '160px',
-            whiteSpace: 'nowrap',
-          }}
+          style={btnBlue}
         >
           Read Full Letter
         </button>
 
-        <button
-          onClick={() => router.back()}
-          style={{
-            padding: '0.6rem 0.8rem',
-            background: '#6c757d',
-            color: 'white',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            flex: 1,
-            maxWidth: '160px',
-            whiteSpace: 'nowrap',
-          }}
-        >
+        <button onClick={() => router.back()} style={btnGrey}>
           Edit Text
         </button>
 
@@ -385,18 +360,7 @@ export default function PreviewPage() {
               handleDownload('pdf');
             }
           }}
-          style={{
-            padding: '0.6rem 0.8rem',
-            background: '#0d6efd',
-            color: 'white',
-            border: 'none',
-            borderRadius: 6,
-            cursor: 'pointer',
-            fontSize: '0.85rem',
-            flex: 1,
-            maxWidth: '160px',
-            whiteSpace: 'nowrap',
-          }}
+          style={btnBlue}
         >
           Download PDF
         </button>
