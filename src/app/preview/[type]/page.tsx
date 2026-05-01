@@ -20,12 +20,13 @@ export default function PreviewPage() {
   const [pendingAction, setPendingAction] = useState(null);
 
   const [scale, setScale] = useState(1);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const updateScale = () => {
       const screenWidth = window.innerWidth;
-      const padding = 32; // 2rem padding on each side
-      const available = screenWidth - padding;
+      const padding = 16; // 1rem on each side
+      const available = screenWidth - padding * 2;
       const newScale = Math.min(1, available / 794);
       setScale(newScale);
     };
@@ -156,12 +157,15 @@ export default function PreviewPage() {
   const {
     writer,
     receiver,
+    through,
     date,
     title,
+    titles,
     salutation,
     paragraphs,
     closing,
-    signature
+    signature,
+    cc
   } = blocks || {};
 
   const visibleContent = [
@@ -226,8 +230,8 @@ export default function PreviewPage() {
     <div
       style={{
         minHeight: '100vh',
-        background: '#f8f9fa',
-        padding: '2rem 1rem 6rem 1rem',
+        background: '#ffffff',
+        padding: '1rem 0 2rem 0',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -287,24 +291,44 @@ export default function PreviewPage() {
           ))}
         </div>
 
+        {/* Through block - left aligned, below receiver */}
+        {through && through.length > 0 && (
+          <div style={{
+            textAlign: 'left',
+            marginBottom: '2.5rem',
+            fontSize: '1.1rem',
+          }}>
+            <div style={{ marginBottom: '0.4rem' }}>Thro&apos;</div>
+            {through.map((l, i) => (
+              <div key={i} style={{ marginBottom: '0.4rem' }}>{l}</div>
+            ))}
+          </div>
+        )}
+
         {/* Salutation */}
         {salutation && (
           <p style={{ marginBottom: '1.5rem' }}>{salutation}</p>
         )}
 
-        {/* Title / Subject */}
-        {title && (
-          <p style={{
-            marginBottom: '2rem',
-            fontWeight: 'bold',
-            textTransform: 'uppercase',
-            textDecoration: 'underline',
-            textUnderlineOffset: '6px',
-            letterSpacing: '0.5px',
-            textAlign: 'center'
-          }}>
-            {title}
-          </p>
+        {/* Titles / Subject - stacked, all bold and underlined */}
+        {titles && titles.length > 0 && (
+          <div style={{ marginBottom: '1.5rem' }}>
+            {titles.map((t, i) => (
+              <p key={i} style={{
+                marginBottom: '0.3rem',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                textDecoration: 'underline',
+                textUnderlineOffset: '6px',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                overflowWrap: 'break-word',
+                wordBreak: 'break-word',
+              }}>
+                {t}
+              </p>
+            ))}
+          </div>
         )}
 
         {/* Visible body - first paragraph only */}
@@ -318,21 +342,41 @@ export default function PreviewPage() {
       </div>
 
       {/* Action Buttons - fixed bottom bar, always visible on all screens */}
-      <div style={{
+      {/* <div style={{
         position: 'fixed',
-        bottom: 0,
+        bottom: '1rem',
         left: 0,
         right: 0,
         background: 'white',
         borderTop: '1px solid #e9ecef',
-        padding: '0.8rem 1rem',
+        padding: '0.6rem 0.5rem calc(0.6rem + env(safe-area-inset-bottom)) 0.5rem',
         display: 'flex',
         justifyContent: 'center',
         gap: '1rem',
-        flexWrap: 'wrap',
+        flexWrap: 'nowrap',
         zIndex: 100,
         boxShadow: '0 -4px 12px rgba(0,0,0,0.08)',
-      }}>
+        borderRadius: '12px',
+        margin: '0 2rem', */}
+
+        {/* Action Buttons */}
+        <div style={{
+        width: '100%',
+        position: 'sticky',
+        bottom: 0,
+        background: 'white',
+        borderTop: '1px solid #e9ecef',
+        padding: '0.8rem 0.5rem 2rem 0.5rem',
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        flexWrap: 'nowrap',
+        zIndex: 100,
+        boxShadow: '0 -4px 12px rgba(0,0,0,0.08)',
+        marginTop: '1rem',
+        }}>
+        
+      
         <button
           onClick={() => {
             if (paymentRequired && !isPaid) {
@@ -503,22 +547,37 @@ export default function PreviewPage() {
               ))}
             </div>
 
+            {/* Through block */}
+            {through && through.length > 0 && (
+              <div style={{ textAlign: 'left', marginBottom: '2.5rem', fontSize: '1.1rem' }}>
+                <div style={{ marginBottom: '0.4rem' }}>Thro&apos;</div>
+                {through.map((l, i) => (
+                  <div key={i} style={{ marginBottom: '0.4rem' }}>{l}</div>
+                ))}
+              </div>
+            )}
+
             {salutation && <p style={{ marginBottom: '1.5rem' }}>{salutation}</p>}
 
-            {title && (
-              <p style={{
-                marginBottom: '2rem',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                textDecoration: 'underline',
-                textUnderlineOffset: '6px',
-                letterSpacing: '0.5px',
-                textAlign: 'center',
-                overflowWrap: 'break-word',
-                wordBreak: 'break-word',
-              }}>
-                {title}
-              </p>
+            {/* Stacked titles */}
+            {titles && titles.length > 0 && (
+              <div style={{ marginBottom: '1.5rem' }}>
+                {titles.map((t, i) => (
+                  <p key={i} style={{
+                    marginBottom: '0.3rem',
+                    fontWeight: 'bold',
+                    textTransform: 'uppercase',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '6px',
+                    letterSpacing: '0.5px',
+                    textAlign: 'center',
+                    overflowWrap: 'break-word',
+                    wordBreak: 'break-word',
+                  }}>
+                    {t}
+                  </p>
+                ))}
+              </div>
             )}
 
             {paragraphs.map((p, i) => (
@@ -545,6 +604,15 @@ export default function PreviewPage() {
                     <div key={i} style={{ marginBottom: '0.3rem' }}>{l}</div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Cc block */}
+            {cc && cc.length > 0 && (
+              <div style={{ textAlign: 'left', marginTop: '2rem', fontSize: '1.1rem' }}>
+                {cc.map((l, i) => (
+                  <div key={i} style={{ marginBottom: '0.3rem' }}>{l}</div>
+                ))}
               </div>
             )}
 
@@ -601,56 +669,61 @@ function parseLetter(content) {
   const blocks = {
     writer: [],
     receiver: [],
+    through: [],
     date: '',
+    titles: [],
     title: '',
     salutation: '',
     paragraphs: [],
     closing: '',
-    signature: []
+    signature: [],
+    cc: []
   };
 
   let stage = 'writer';
+  let inThrough = false;
 
   for (const line of lines) {
+    // Date detection
     if (!blocks.date && /\d{4}|January|February|March|April|May|June|July|August|September|October|November|December/i.test(line)) {
       blocks.date = line;
       stage = 'receiver';
       continue;
     }
 
+    // Thro / Through detection
+    if (/^(thro'?|through:?|thro:?)/i.test(line)) {
+      inThrough = true;
+      stage = 'through';
+      continue;
+    }
+
+    // Salutation detection
     if (/^dear/i.test(line)) {
       blocks.salutation = line;
+      inThrough = false;
       stage = 'body';
       continue;
     }
 
-    const cleanedLine = line.trim();
-    const upperLine = cleanedLine.toUpperCase();
-
-    const titleStarters = [
-      'APPLICATION',
-      'REQUEST',
-      'APPEAL',
-      'COMPLAINT',
-      'REPORT',
-      'PETITION',
-      'PROPOSAL',
-      'NOTICE',
-      'RE:',
-      'REQUEST FOR',
-      'APPLICATION FOR'
-    ];
-
-    if (
-      blocks.salutation &&
-      !blocks.title &&
-      cleanedLine &&
-      (upperLine === cleanedLine || titleStarters.some(word => upperLine.startsWith(word)))
-    ) {
-      blocks.title = cleanedLine;
+    // Cc detection - after signature
+    if (/^(cc:|c\.c:|cc |carbon copy)/i.test(line)) {
+      stage = 'cc';
+      blocks.cc.push(line);
       continue;
     }
 
+    const cleanedLine = line.trim();
+
+    // Title detection - lines wrapped in **...**
+    if (/^\*\*(.+)\*\*$/.test(cleanedLine)) {
+      const titleText = cleanedLine.replace(/^\*\*|\*\*$/g, '').trim();
+      blocks.titles.push(titleText);
+      blocks.title = blocks.titles[0];
+      continue;
+    }
+
+    // Closing detection
     if (/^(yours|sincerely|faithfully|best regards|regards)/i.test(line)) {
       blocks.closing = line;
       stage = 'signature';
@@ -659,7 +732,9 @@ function parseLetter(content) {
 
     if (stage === 'writer') { blocks.writer.push(line); continue; }
     if (stage === 'receiver') { blocks.receiver.push(line); continue; }
+    if (stage === 'through') { blocks.through.push(line); continue; }
     if (stage === 'signature') { blocks.signature.push(line); continue; }
+    if (stage === 'cc') { blocks.cc.push(line); continue; }
     if (stage === 'body') { blocks.paragraphs.push(line); }
   }
 
